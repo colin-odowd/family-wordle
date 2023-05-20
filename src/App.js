@@ -5,7 +5,7 @@ import Header from './Header';
 import LoginForm from './LoginForm'; 
 import AdminPage from './AdminPage'; 
 
-import { getAuth, signInWithEmailAndPassword, onAuthStateChanged } from "firebase/auth";
+import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
 import { initializeApp } from "firebase/app";
 import { getAnalytics } from "firebase/analytics";
 
@@ -22,64 +22,47 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const analytics = getAnalytics(app);
 
-function HomePage() {
+function HomePage({ setIsAuthenticated, isAuthenticated }) {
   const navigate = useNavigate();
-  const [showLogin, setShowLogin] = useState(false);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const auth = getAuth();
-
-  useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
-      setIsAuthenticated(!!user);
-      if (user) {
-        navigate('/admin');
-      }
-    });
-
-    return () => unsubscribe();
-  }, [auth, navigate]);
-
-  const handleLoginClick = () => {
-    setShowLogin(true);
-  }
 
   const handleLogin = async (username, password) => {
     try {
       await signInWithEmailAndPassword(auth, username, password);
-      console.log('Login successful');
-      navigate('/admin'); // Navigate to the admin page on successful login
+      setIsAuthenticated(true);
+      navigate('/admin');
     } catch (error) {
       console.log(error.message);
     }
   };
-  
+
   return (
     <div className="App">
         <Header
             isAuthenticated={isAuthenticated}
-            handleLoginClick={handleLoginClick}
-            handleLoginFormSubmit={handleLogin} // Pass handleLogin as a prop
+            handleLoginFormSubmit={handleLogin}
         />
-        {showLogin ? <LoginForm handleLogin={handleLogin} /> : null}
     </div>
   );
 }
 
 function App() {
+  const [isAuthenticated, setIsAuthenticated] = useState(
+    localStorage.getItem('isAuthenticated') === 'true' || false
+  );
+
+  useEffect(() => {
+    localStorage.setItem('isAuthenticated', isAuthenticated);
+  }, [isAuthenticated]);
+  
   return (
     <Router>
       <Routes>
-        <Route path="/" element={<HomePage />} />
-        <Route path="/admin" element={<AdminPage />} />
+        <Route path="/" element={<HomePage setIsAuthenticated={setIsAuthenticated} isAuthenticated={isAuthenticated} />} />
+        <Route path="/admin" element={<AdminPage isAuthenticated={isAuthenticated}  />} />
       </Routes>
     </Router>
   );
 }
 
 export default App;
-
-
-
-
-
-

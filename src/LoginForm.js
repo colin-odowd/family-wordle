@@ -8,7 +8,6 @@ const LoginForm = ({ handleLogin }) => {
         event.preventDefault();
         handleLogin(username, password);
     }
-
     return (
         <form onSubmit={onSubmit}>
             <label>

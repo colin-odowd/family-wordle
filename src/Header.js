@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import LoginForm from './LoginForm';
 
-function Header({ isAuthenticated, handleLoginClick, handleLoginFormSubmit }) {
+function Header({ isAuthenticated, handleLoginFormSubmit }) {
   const [showLoginForm, setShowLoginForm] = useState(false);
 
   const handleLoginButtonClick = () => {
@@ -18,7 +18,7 @@ function Header({ isAuthenticated, handleLoginClick, handleLoginFormSubmit }) {
               Admin Login
             </button>
           ) : (
-            <LoginForm handleLogin={handleLoginFormSubmit} /> // Updated prop name
+            <LoginForm handleLogin={handleLoginFormSubmit} />
           )}
         </>
       )}
